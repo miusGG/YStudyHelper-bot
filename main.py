@@ -1,13 +1,14 @@
-import discord  # Подключаем библиотеку
+import discord
 from discord.ext import commands
 from info import token
 from discord.utils import get
 import asyncio
 
-intents = discord.Intents.default()  # Подключаем "Разрешения"
+intents = discord.Intents.default()
 intents.message_content = True
-# Задаём префикс и интенты
 bot = commands.Bot(command_prefix='>', intents=intents)
+auth_channel1 = 1206656465616764998
+guild_id = 1206656352857096312
 
 
 @bot.command()
@@ -41,7 +42,7 @@ async def make_channel(ctx):
     user = ctx.message.author
     guild = ctx.guild
     member = ctx.author
-    message_content = f'Канал для аунтификации пользователя - "{member}" успешно создан! Выберите ваш ГОД и ГРУППУ обучния.'
+    message_content = f'Канал для аунтификации пользователя - "{member}" успешно создан! Выберите ваш ГОД и ГРУППУ обучния в соответсвующем канале.'
     await user.send(message_content)
     admin_role = get(guild.roles, name="Admin")
     overwrites = {
@@ -51,11 +52,12 @@ async def make_channel(ctx):
     }
     channel = await guild.create_text_channel(f'auth for {member}', overwrites=overwrites)
 
-    message = await channel.send('Выберите группу и год:\n1. Группа 1\n2. Группа 2')
+    name_msg = member
 
-    # Добавляем реакции к сообщению
-    await message.add_reaction('1️⃣')
-    await message.add_reaction('2️⃣')
+    message1 = await channel.send('Выберите группу и год:\n1. Группа 1\n2. Группа 2')
+
+    await message1.add_reaction('1️⃣')
+    await message1.add_reaction('2️⃣')
 
     def check(reaction, user):
         return user == ctx.author and str(reaction.emoji) in ['1️⃣', '2️⃣']
@@ -63,20 +65,19 @@ async def make_channel(ctx):
     reaction, _ = await bot.wait_for('reaction_add', timeout=60.0, check=check)
 
     if reaction.emoji == '1️⃣':
-        role = discord.utils.get(ctx.guild.roles, name='группа 1')
+        role1 = discord.utils.get(ctx.guild.roles, name='группа 1')
     elif reaction.emoji == '2️⃣':
-        role = discord.utils.get(ctx.guild.roles, name='группа 2')
+        role1 = discord.utils.get(ctx.guild.roles, name='группа 2')
     else:
-        await message.delete()
+        await message1.delete()
         await channel.send('Неверный выбор.')
         return
-    await ctx.author.add_roles(role)
-    await message.delete()
-    await channel.send('Выбор подтвержден.')
+
+    await message1.delete()
+    await channel.send('Выбор учтен.')
 
     message = await channel.send('Выберите год:\n1. Год 1\n2. Год 2')
 
-    # Добавляем реакции к сообщению
     await message.add_reaction('1️⃣')
     await message.add_reaction('2️⃣')
 
@@ -93,11 +94,42 @@ async def make_channel(ctx):
         await message.delete()
         await channel.send('Неверный выбор.')
         return
-    await ctx.author.add_roles(role)
-    await message.delete()
-    await channel.send('Выбор подтвержден.')
 
-    await channel.delete()
+    await message.delete()
+    await channel.send('Выбор учтен.')
+
+    global auth_channel1
+
+    guild = bot.get_guild(guild_id)
+    auth_channel = guild.get_channel(auth_channel1)
+
+    check_mesaage = await auth_channel.send(f'Подтвердите действия {name_msg} - Он выбрал str(его группа и год)')
+    await check_mesaage.add_reaction('✅')
+    await check_mesaage.add_reaction('❌')
+
+    def check(reaction, user):
+        return user == ctx.author and str(reaction.emoji) in ['✅', '❌']
+
+    try:
+        reaction, _ = await bot.wait_for('reaction_add', timeout=None, check=check)
+        if str(reaction.emoji) == '✅':
+            await auth_channel.send("ОДОБРЕНО!")
+
+            await user.send("ВАША ЗАЯВКА ОДОБРЕНА")
+
+            await ctx.author.add_roles(role)
+            await ctx.author.add_roles(role1)
+            await channel.send('Выбор подтвержден.')
+            await channel.delete()
+        elif str(reaction.emoji) == '❌':
+            await auth_channel.send("НЕОДОБРЕНО!")
+
+            await user.send("ВАША ЗАЯВКА НЕ ОДОБРЕНА")
+
+            await channel.send('Выбор не поддтвержден')
+            await channel.delete()
+    except asyncio.TimeoutError:
+        await ctx.send("You did not react in time.")
 
 
 @bot.command()
