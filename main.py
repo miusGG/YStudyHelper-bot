@@ -17,7 +17,20 @@ async def ping(ctx):
 
 @bot.command()
 async def question(ctx):
-    await ctx.send('pong')
+    await ctx.message.delete()
+    user = ctx.message.author
+    guild = ctx.guild
+    member = ctx.author
+    message_content = f'Канал для вопроса учителю создан - тезисно напиши там свой вопрос. Чтобы удалить канал - >delete_channel'
+    await user.send(message_content)
+    admin_role = get(guild.roles, name="Admin")
+    overwrites = {
+        guild.default_role: discord.PermissionOverwrite(read_messages=False),
+        guild.me: discord.PermissionOverwrite(read_messages=True),
+        admin_role: discord.PermissionOverwrite(read_messages=True)
+    }
+    channel = await guild.create_text_channel(f'Вопрос от {member}', overwrites=overwrites)
+
 
 
 class HelperView(discord.ui.View):
@@ -133,10 +146,18 @@ async def make_channel(ctx):
 
 
 @bot.command()
-async def delete_channel(ctx, channel_id):
-    channel = bot.get_channel(int(channel_id))
-    await channel.delete()
-    await ctx.send("Канал удален")
+async def delete_channel(ctx):
+    def check(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel and msg.content.lower() in ['да', 'нет']
+
+    await ctx.send('Вы уверены, что хотите удалить этот чат? Напиши - (да/нет)')
+    confirmation = await bot.wait_for('message', check=check)
+
+    if confirmation.content.lower() == 'да':
+        await ctx.channel.delete()
+        await ctx.send('Чат успешно удален.')
+    else:
+        await ctx.send('Удаление чата отменено.')
 
 
 @bot.command()
