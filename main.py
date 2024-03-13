@@ -17,19 +17,20 @@ async def ping(ctx):
 
 @bot.command()
 async def question(ctx):
-    await ctx.message.delete()
     user = ctx.message.author
     guild = ctx.guild
-    member = ctx.author
+    member = user
     message_content = f'Канал для вопроса учителю создан - тезисно напиши там свой вопрос. Чтобы удалить канал - >delete_channel'
     await user.send(message_content)
     admin_role = get(guild.roles, name="Admin")
     overwrites = {
         guild.default_role: discord.PermissionOverwrite(read_messages=False),
-        guild.me: discord.PermissionOverwrite(read_messages=True),
+        member: discord.PermissionOverwrite(read_messages=True),
         admin_role: discord.PermissionOverwrite(read_messages=True)
     }
     channel = await guild.create_text_channel(f'Вопрос от {member}', overwrites=overwrites)
+    await ctx.message.delete()
+
 
 
 
@@ -40,30 +41,30 @@ class HelperView(discord.ui.View):
 
     @discord.ui.button(label="Все команды", row=1, style=discord.ButtonStyle.primary)
     async def second_button_callback(self, interaction, button):
-        await interaction.response.send_message("Commands")
+        await interaction.response.send_message("Вот все доступные команды:\n>question - создать канал для вопроса учителю.\n>? - команда по выдачи документаций и полезных материалов для учеников!")
 
 
 @bot.event
 async def on_member_join(member):
-    role = discord.utils.get(member.guild.roles, name="new")
+    role = member.guild.get_role(role_id=1208730162414485555)
     await member.add_roles(role)
 
 
 @bot.command()
 async def make_channel(ctx):
-    await ctx.message.delete()
-    user = ctx.message.author
+    user = ctx.author
     guild = ctx.guild
-    member = ctx.author
+    member = user
     message_content = f'Канал для аунтификации пользователя - "{member}" успешно создан! Выберите ваш ГОД и ГРУППУ обучния в соответсвующем канале.'
     await user.send(message_content)
     admin_role = get(guild.roles, name="Admin")
     overwrites = {
         guild.default_role: discord.PermissionOverwrite(read_messages=False),
-        guild.me: discord.PermissionOverwrite(read_messages=True),
+        member: discord.PermissionOverwrite(read_messages=True),
         admin_role: discord.PermissionOverwrite(read_messages=True)
     }
     channel = await guild.create_text_channel(f'auth for {member}', overwrites=overwrites)
+    await ctx.message.delete()
 
     name_msg = member
 
@@ -145,6 +146,7 @@ async def make_channel(ctx):
         await ctx.send("You did not react in time.")
 
 
+
 @bot.command()
 async def delete_channel(ctx):
     def check(msg):
@@ -165,7 +167,7 @@ async def helper(ctx):
     await ctx.message.delete()
     user = ctx.message.author
     member = ctx.author
-    message_content = f'Руководство по использованию этого бота.\nВыберите что бы Вы хотели бы узнать:'
+    message_content = f'Руководство по использованию этого бота.\nВот все доступные команды:\n>question - создать канал для вопроса учителю.\n>? - команда по выдачи документаций и полезных материалов для учеников!\nВыберите что бы Вы хотели бы узнать:'
     await user.send(message_content, view=HelperView())
 
 
