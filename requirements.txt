@@ -1,2 +1,1 @@
-discord
-asyncio
+discord~=2.3.2
