@@ -20,7 +20,7 @@ class HelperView(discord.ui.View):
 
     @discord.ui.button(label="Все команды", row=1, style=discord.ButtonStyle.primary)
     async def second_button_callback(self, interaction, button):
-        await interaction.response.send_message("Вот все доступные команды:\n>question - создать канал для вопроса учителю.\n>? - команда по выдачи документаций и полезных материалов для учеников!")
+        await interaction.response.send_message("Вот все доступные команды:\n>question - создать канал для вопроса учителю.\n>docs - команда по выдачи документаций и полезных материалов для учеников!")
 
 
 class DocsView3(discord.ui.View):
@@ -72,12 +72,17 @@ class DocsView1(discord.ui.View):
 async def ping(ctx):
     await ctx.send('pong')
 
+
+@bot.event
+async def on_ready():
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="чем помочь ученикам Яндекс Лицея!"))
+
 @bot.command()
 async def question(ctx):
     user = ctx.message.author
     guild = ctx.guild
     member = user
-    message_content = f'Канал для вопроса учителю создан - тезисно напиши там свой вопрос. Чтобы удалить канал - >delete_channel'
+    message_content = f'Канал для вопроса учителю создан - тезисно напиши там свой вопрос. Чтобы удалить канал: ```>delete_channel```'
     await user.send(message_content)
     admin_role = get(guild.roles, name="Admin")
     overwrites = {
@@ -126,8 +131,10 @@ async def make_channel(ctx):
 
     if reaction.emoji == '1️⃣':
         role1 = discord.utils.get(ctx.guild.roles, name='группа 1')
+        role_str = "1 группу и"
     elif reaction.emoji == '2️⃣':
         role1 = discord.utils.get(ctx.guild.roles, name='группа 2')
+        role_str = "2 группа и"
     else:
         await message1.delete()
         await channel.send('Ошибка... Вы что-то не так выбрали..')
@@ -148,8 +155,10 @@ async def make_channel(ctx):
 
     if reaction.emoji == '1️⃣':
         role = discord.utils.get(ctx.guild.roles, name='год 1')
+        role_str = role_str + "1ый год обучения"
     elif reaction.emoji == '2️⃣':
         role = discord.utils.get(ctx.guild.roles, name='год 2')
+        role_str = role_str + "2ой год обучения"
     else:
         await message.delete()
         await channel.send('Ошибка... Вы что-то не так выбрали.')
@@ -163,7 +172,7 @@ async def make_channel(ctx):
     guild = bot.get_guild(guild_id)
     auth_channel = guild.get_channel(auth_channel1)
 
-    check_mesaage = await auth_channel.send(f'Подтвердите действия {name_msg} - Он выбрал str(его группа и год)')
+    check_mesaage = await auth_channel.send(f'Подтвердите действия {name_msg} - Он выбрал {role_str}')
     await check_mesaage.add_reaction('✅')
     await check_mesaage.add_reaction('❌')
 
@@ -212,7 +221,7 @@ async def helper(ctx):
     await ctx.message.delete()
     user = ctx.message.author
     member = ctx.author
-    message_content = f'Руководство по использованию этого бота.\nВот все доступные команды:\n>question - создать канал для вопроса учителю.\n>? - команда по выдачи документаций и полезных материалов для учеников!\nВыберите что бы Вы хотели бы узнать:'
+    message_content = f'Руководство по использованию этого бота.\nВот все доступные команды:\n>question - создать канал для вопроса учителю.\n>docs - команда по выдачи документаций и полезных материалов для учеников!\nВыберите что бы Вы хотели бы узнать:'
     await user.send(message_content, view=HelperView())
 
 
