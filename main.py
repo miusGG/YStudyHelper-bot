@@ -51,11 +51,11 @@ class DocsView3(discord.ui.View):
 class DocsView2(discord.ui.View):
     @discord.ui.button(label="Скачивание IDE и настройка", row=0, style=discord.ButtonStyle.primary)
     async def firstModule_button_callback(self, interaction, button):
-        await interaction.response.send_message("Видео итструкция (не официальная) - https://yandex.ru/video/preview/12460819480399738578 \nСсылка на скачивание с сайта разработчиков - https://www.jetbrains.com/pycharm-edu/ \n")
+        await interaction.response.send_message("Видео итструкция (не официальная) - https://yandex.ru/video/preview/12460819480399738578 \nСсылка на скачивание с сайта разработчиков - https://www.jetbrains.com/pycharm-edu/ \n", view=DocsView2())
 
     @discord.ui.button(label="Вспомогательная информация при ихучении Python", row=1, style=discord.ButtonStyle.primary)
     async def secondModule_button_callback(self, interaction, button):
-        await interaction.response.send_message("Вспомогательный курс по Python - https://itproger.com/course/python \n Удобная документация - https://www.python.org/doc/ \n Комнадна для обновления pip - ``` python -m pip install --upgrade pip```")
+        await interaction.response.send_message("Вспомогательный курс по Python - https://itproger.com/course/python \n Удобная документация - https://www.python.org/doc/ \n Комнадна для обновления pip - ``` python -m pip install --upgrade pip```", view=DocsView2())
 
 class DocsView1(discord.ui.View):
     @discord.ui.button(label="1 ГОД обучения", row=0, style=discord.ButtonStyle.primary, emoji="🤓")
