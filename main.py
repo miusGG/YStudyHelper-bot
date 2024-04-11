@@ -57,14 +57,6 @@ class DocsView2(discord.ui.View):
     async def secondModule_button_callback(self, interaction, button):
         await interaction.response.send_message("Вспомогательный курс по Python - https://itproger.com/course/python \n Удобная документация - https://www.python.org/doc/ \n Комнадна для обновления pip - ``` python -m pip install --upgrade pip```")
 
-    @discord.ui.button(label="3", row=0, style=discord.ButtonStyle.primary)
-    async def thirdModule_button_callback(self, interaction, button):
-        pass
-
-    @discord.ui.button(label="4", row=1, style=discord.ButtonStyle.primary)
-    async def fourthModule_button_callback(self, interaction, button):
-        pass
-
 class DocsView1(discord.ui.View):
     @discord.ui.button(label="1 ГОД обучения", row=0, style=discord.ButtonStyle.primary, emoji="🤓")
     async def firstYear_button_callback(self, interaction, button):
