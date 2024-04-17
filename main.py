@@ -15,9 +15,9 @@ news12_id = 1218168055386083369
 news21_id = 1
 news22_id = 1
 bogdan_id = 416583789255327745
-#не забыть заменить id на нужные!!!!!!!!!!!!!
 
 
+# не забыть заменить id на нужные!!!!!!!!!!!!!
 
 
 @bot.command()
@@ -27,14 +27,17 @@ async def ping(ctx):
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="чем помочь ученикам Яндекс Лицея!"))
+    await bot.change_presence(
+        activity=discord.Activity(type=discord.ActivityType.watching, name="чем помочь ученикам Яндекс Лицея!"))
+
 
 @bot.command()
 async def question(ctx):
     user = ctx.message.author
     guild = ctx.guild
     member = user
-    message_content = f'Канал для вопроса учителю создан - тезисно напиши там свой вопрос. Чтобы удалить канал: ```>delete_channel```'
+    message_content = (f'Канал для вопроса учителю создан - тезисно напиши там свой вопрос. Чтобы удалить канал: '
+                       f'```>delete_channel```')
     await user.send(message_content)
     admin_role = get(guild.roles, name="Admin")
     overwrites = {
@@ -61,7 +64,8 @@ async def make_channel(ctx, name_msg1, name_msg2, name_msg3):
     user = ctx.author
     guild = ctx.guild
     member = user
-    message_content = f'Канал для аунтификации пользователя - "{member}" успешно создан! Выберите ваш ГОД и ГРУППУ обучния в соответсвующем канале.'
+    message_content = (f'Канал для аунтификации пользователя - "{member}" успешно создан! Выберите ваш ГОД и ГРУППУ '
+                       f'обучния в соответсвующем канале.')
     await user.send(message_content)
     admin_role = get(guild.roles, name="Admin")
     overwrites = {
@@ -179,7 +183,9 @@ async def helper(ctx):
     await ctx.message.delete()
     user = ctx.message.author
     member = ctx.author
-    message_content = f'Руководство по использованию этого бота.\nВот все доступные команды:\n>question - создать канал для вопроса учителю.\n>docs - команда по выдачи документаций и полезных материалов для учеников!\nВыберите что бы Вы хотели бы узнать:'
+    message_content = (f'Руководство по использованию этого бота.\nВот все доступные команды:\n>question - создать '
+                       f'канал для вопроса учителю.\n>docs - команда по выдачи документаций и полезных материалов для '
+                       f'учеников!\nВыберите что бы Вы хотели бы узнать:')
     await user.send(message_content, view=HelperView())
 
 
@@ -201,9 +207,10 @@ async def news(ctx):
     member = user
     channel = ctx.channel
     await ctx.message.delete()
-    name_msg = member
 
-    message1 = await channel.send('Выберите группу, которой написать объявление:\n1️⃣ - 1 группа 1 год\n2️⃣ - 2 группа 1 год\n3️⃣ - 1 группа 2 год\n4️⃣ - 2 группа 2 год\n0️⃣ - ВСЕМ')
+    message1 = await channel.send(
+        'Выберите группу, которой написать объявление:\n1️⃣ - 1 группа 1 год\n2️⃣ - 2 группа 1 год\n3️⃣ - 1 группа 2 '
+        'год\n4️⃣ - 2 группа 2 год\n0️⃣ - ВСЕМ')
 
     await message1.add_reaction('1️⃣')
     await message1.add_reaction('2️⃣')
@@ -233,8 +240,6 @@ async def news(ctx):
         await message1.delete()
         await channel.send('Ошибка... Вы что-то не так выбрали.')
         return
-
-
 
     await message1.delete()
     await channel.send('Напишите объявление для этой группы:')
