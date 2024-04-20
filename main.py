@@ -4,6 +4,9 @@ from info import token
 from discord.utils import get
 import asyncio
 from classes import HelperView, DocsView1
+import random
+
+random.seed(a=None, version=2)
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -18,6 +21,29 @@ bogdan_id = 416583789255327745
 
 
 # не забыть заменить id на нужные!!!!!!!!!!!!!
+
+
+@bot.command()
+@commands.has_role("Admin")
+async def split(ctx, *, mes):
+    await ctx.message.delete()
+    helpSplitTeams = mes.split(' ')
+
+    finalTeams = []
+    for i in range(len(helpSplitTeams) // 2):
+        finalTeams.append([])
+    for i in range(len(finalTeams)):
+        for j in range(2):
+            localHelpSplit = helpSplitTeams[random.randint(0, len(helpSplitTeams) - 1)]
+            finalTeams[i].append(localHelpSplit)
+            helpSplitTeams.remove(localHelpSplit)
+    if len(helpSplitTeams) > 0:
+        finalTeams[random.randint(0, len(finalTeams) - 1)].append(helpSplitTeams[0])
+
+    await ctx.channel.send('Команды распределены:')
+    for i in range(len(finalTeams)):
+        localTeammates = f"{i + 1} - {' '.join(finalTeams[i])}"
+        await ctx.channel.send(localTeammates)
 
 
 @bot.command()
@@ -195,7 +221,8 @@ async def admin_helper(ctx):
     await ctx.message.delete()
     user = ctx.message.author
     member = ctx.author
-    message_content = ">news - для создания новости\n>delete_channel - удалить канал"
+    message_content = (">news - для создания новости\n>delete_channel - удалить канал\n>split ...(ученики через "
+                       "пробел) - распределение по командам")
     await user.send(message_content, view=HelperView())
 
 
@@ -204,7 +231,6 @@ async def admin_helper(ctx):
 async def news(ctx):
     user = ctx.author
     guild = ctx.guild
-    member = user
     channel = ctx.channel
     await ctx.message.delete()
 
