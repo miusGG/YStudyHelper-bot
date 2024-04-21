@@ -17,6 +17,10 @@ news11_id = 1218168029288861757
 news12_id = 1218168055386083369
 news21_id = 1230165673926332477
 news22_id = 1230165673985052733
+role_name1g = "группа 1"
+role_name2g = "группа 2"
+role_name1y = "год 1"
+role_name2y = "год 2"
 bogdan_id = 416583789255327745
 
 
@@ -161,8 +165,10 @@ async def make_channel(ctx, name_msg1, name_msg2, name_msg3):
     await check_mesaage.add_reaction('✅')
     await check_mesaage.add_reaction('❌')
 
-    def check(reaction, user):
-        return user == ctx.author and str(reaction.emoji) in ['✅', '❌']
+    async def check(reaction, user):
+        global bogdan_id
+        logUser = user = await bot.fetch_user(bogdan_id)
+        return user == logUser and str(reaction.emoji) in ['✅', '❌']
 
     try:
         reaction, _ = await bot.wait_for('reaction_add', timeout=None, check=check)
@@ -208,7 +214,6 @@ async def delete_channel(ctx):
 async def helper(ctx):
     await ctx.message.delete()
     user = ctx.message.author
-    member = ctx.author
     message_content = (f'Руководство по использованию этого бота.\nВот все доступные команды:\n>question - создать '
                        f'канал для вопроса учителю.\n>docs - команда по выдачи документаций и полезных материалов для '
                        f'учеников!\n>admin_helper - для команд админа\nВыберите что бы Вы хотели бы узнать:')
@@ -220,16 +225,14 @@ async def helper(ctx):
 async def admin_helper(ctx):
     await ctx.message.delete()
     user = ctx.message.author
-    member = ctx.author
     message_content = (">news - для создания новости\n>delete_channel - удалить канал\n>split ...(ученики через "
                        "пробел) - распределение по командам")
-    await user.send(message_content, view=HelperView())
+    await user.send(message_content)
 
 
 @bot.command()
 @commands.has_role("Admin")
 async def news(ctx):
-    user = ctx.author
     guild = ctx.guild
     channel = ctx.channel
     await ctx.message.delete()
@@ -271,29 +274,39 @@ async def news(ctx):
     await channel.send('Напишите объявление для этой группы:')
     announcement = await bot.wait_for('message', check=lambda m: m.author == ctx.author)
 
+    global role_name1g
+    global role_name1y
+    global role_name2g
+    global role_name2y
+
+    role_1g = discord.utils.get(ctx.guild.roles, name=role_name1g)
+    role_2g = discord.utils.get(ctx.guild.roles, name=role_name2g)
+    role_1y = discord.utils.get(ctx.guild.roles, name=role_name1y)
+    role_2y = discord.utils.get(ctx.guild.roles, name=role_name2y)
+
     if team11:
         global news11_id
         news_channel = guild.get_channel(news11_id)
-        await news_channel.send(announcement.content)
+        await news_channel.send(f"{role_1g.mention}{role_1y.mention}\n" + announcement.content)
         await ctx.send("Объявление успешно переслано. 1 год 1 группа")
 
     if team12:
         global news12_id
         news_channel = guild.get_channel(news12_id)
-        await news_channel.send(announcement.content)
+        await news_channel.send(f"{role_2g.mention}{role_1y.mention}\n" + announcement.content)
         await ctx.send("Объявление успешно переслано. 1 год 2 группа")
 
     if team21:
         global news21_id
         news_channel = guild.get_channel(news21_id)
-        await news_channel.send(announcement.content)
+        await news_channel.send(f"{role_1g.mention}{role_2y.mention}\n" + announcement.content)
         await ctx.send("Объявление успешно переслано. 2 год 1 группа")
 
     if team22:
         global news22_id
         news_channel = guild.get_channel(news22_id)
-        await news_channel.send(announcement.content)
-        await ctx.send("Объявление успешно переслано. 2  год 2 группаs")
+        await news_channel.send(f"{role_2g.mention}{role_2y.mention}\n" + announcement.content)
+        await ctx.send("Объявление успешно переслано. 2  год 2 группа")
 
 
 @bot.command()
